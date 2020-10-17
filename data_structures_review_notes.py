@@ -193,3 +193,178 @@ new_stack.push(5)
 print(new_stack.stack)
 print(len(new_stack))
 print(f'Removed value is {new_stack.pop()}')
+
+
+# Video III
+
+class ListNode:
+  def __init__(self, value, prev=None, next=None):
+    self.value = value
+    self.prev = prev
+    self.next = next
+
+  def delete(self):
+    if self.prev:
+      self.prev.next = self.next
+    if self.next:
+      self.next.prev = self.prev
+
+class DoublyLinkedList:
+  def __init__(self, node=None):
+    self.head = node
+    self.tail = node
+    self.length = 1 if node is not None else 0
+
+  def __len__(self):
+    return self.length
+
+  def add_to_head(self, value):
+    # don't need Nones, just being explicit 
+    new_node = ListNode(value, None, None)
+    self.length += 1
+    # if list is currently empty, add node in that case
+    if self.head is None and self.tail is None:
+      self.head = new_node
+      self.tail = new_node
+    else:
+      # the list already has elements in it
+      # make new node point to current head
+      new_node.next = self.head
+      self.head.prev = new_node
+      self.head = new_node
+
+  def remove_from_head(self):
+    if self.head is None:
+      return None
+    head_value = self.head.value
+    self.delete(self.head)
+    return head_value
+
+  def add_to_tail(self, value):
+    new_node = ListNode(value, None, None)
+    self.length += 1
+    if self.head is None and self.tail is None:
+      self.head = new_node
+      self.tail = new_node
+    else:
+      new_node.prev = self.tail
+      self.tail.next = new_node
+      self.tail = new_node
+
+  def remove_from_tail(self):
+    if self.tail is None:
+      return None
+    tail_value = self.tail.value
+    self.delete(self.tail)
+    return tail_value
+
+  def move_to_front(self, node):
+    if node is self.head:
+      return
+    old_value = node.value
+    self.delete(node)
+    self.add_to_head(old_value)
+
+  def move_to_end(self, node):
+    if node is self.tail:
+      return
+    old_value = node.value
+    self.delete(node)
+    self.add_to_tail(old_value)
+
+  def delete(self, node):
+    # the list is empty - do nothing
+    if self.head is None and self.tail is None:
+      return
+    # the list is only one node
+    self.length -= 1
+    if self.head == self.tail and node == self.head:
+      self.head = None
+      self.tail = None
+    # the node is the head node 
+    if self.head == node:
+      self.head = node.next 
+      node.delete() 
+    # the node is the tail node
+    if self.tail == node:
+      self.tail = node.prev
+      node.delete()
+    # the node is just some node in the list
+    else:
+      node.delete()
+
+  def get_max(self):
+    if self.head is None:
+      return None
+    max_val = self.head.value
+    current = self.head
+    while current:
+      if current.value > max_val:
+        max_val = current.value
+      current = current.next
+    return max_val
+
+
+# Video III and IV
+# BST - Binary Search Tree - value, children, no loops, only two children max
+
+class BSTNode:
+  def __init__(self, value):
+    self.value = value
+    self.left = None
+    self.right = None
+
+
+  def insert(self, value):
+    # take the current value of our node (self.value)
+    # compare to the new value we want to insert
+
+    if value < self.value:
+      # if self.left is already taken by a node
+        # make that node call insert
+      # set the left to the new node with new value
+      if self.left is None:
+        self.left = BSTNode(value)
+      else:
+        self.left.insert(value)
+
+    if value >= self.value:
+      # if self.right is already taken by a node
+        # make that node call insert
+      # set the right child to the new node with new value
+      if self.right is None:
+        self.right = BSTNode(value)
+      else:
+        self.right.insert(value)
+
+
+  def contains(self, target):
+    if self.value == target:
+      return True
+
+    found = False  
+    if self.value < target:
+      if self.left is None:
+        return False
+      found = self.left.contains(target)
+
+    if self.value >= target:
+      if self.right is None:
+        return False
+      found = self.right.contains(target)
+
+    return found
+
+
+  def get_max(self):
+    pass
+
+  def for_each(self, fn):
+    pass
+
+  def in_order_print(self, node):
+    pass
+
+
+root_node = BSTNode(8)
+root_node.insert(3)
