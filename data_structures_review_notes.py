@@ -52,51 +52,98 @@ class Node:
     self.value = value
     self.next_node = next_node
 
-class Stack:
-  def __init__(self):
-    self.size = 0
-    self.stack = LinkedList()
+# class Stack:
+#   def __init__(self):
+#     self.size = 0
+#     self.stack = LinkedList()
 
-  def __len__(self):
-    return self.size
+#   def __len__(self):
+#     return self.size
 
-  def push(self, value):
-    self.size += 1
-    self.stack.add_to_head(value)
+#   def push(self, value):
+#     self.size += 1
+#     self.stack.add_to_head(value)
 
-  def pop(self):
-    if self.size == 0:
-      return None
-    self.size -= 1
-    node = self.stack.remove_head()
-    return node
+#   def pop(self):
+#     if self.size == 0:
+#       return None
+#     self.size -= 1
+#     node = self.stack.remove_head()
+#     return node
+
+# class Queue:
+#   def __init__(self):
+#     self.size = 0
+#     self.queue = LinkedList()
+
+#   def __len__(self):
+#     return self.size
+
+#   def enqueue(self, value):
+#     # add to tail
+#     self.size += 1
+#     self.queue.add_to_tail(value)
+
+#   def dequeue(self):
+#     # remove from head
+#     if self.size == 0:
+#       return None
+
+#     self.size -= 1
+#     value = self.queue.remove_head()
+#     return value
 
 class Queue:
-  def __init__(self):
-    self.size = 0
-    self.queue = LinkedList()
+    def __init__(self):
+        self.size = 0
+        self.storage = LinkedList()
+    
+    def __len__(self):
+        return self.size
 
-  def __len__(self):
-    return self.size
+    def enqueue(self, value):
+        self.size += 1
+        return self.storage.add_to_tail(value)
 
-  def enqueue(self, value):
-    # add to tail
-    self.size += 1
-    self.queue.add_to_tail(value)
+    def dequeue(self):
+        if self.size > 0:
+            self.size -= 1
+            node = self.storage.remove_head()
+            return node
+        return None
 
-  def dequeue(self):
-    # remove from head
-    if self.size == 0:
-      return None
+class Stack:
+    def __init__(self):
+        self.size = 0
+        self.storage = LinkedList()
 
-    self.size -= 1
-    value = self.queue.remove_head()
-    return value
+    def __len__(self):
+        return self.size
+
+    def push(self, value):
+        self.size += 1
+        return self.storage.add_to_head(value)
+
+    def pop(self):
+        if self.size > 0:
+            self.size -= 1
+            node = self.storage.remove_head()
+            return node
+        return None
 
 class LinkedList:
   def __init__(self):
     self.head = None
     self.tail = None
+
+  def __str__(self):
+        output = ""
+        current_node = self.head
+        while current_node is not None:
+            output += f"{current_node.value}"
+            # Update the tracker node to the next node
+            current_node = current_node.next_node
+        return output
 
   def add_to_head(self, value):
     new_node = Node(value)
@@ -159,6 +206,17 @@ class LinkedList:
 
     return False
 
+  def get_list_size(self):
+        i = 0
+        current_item = self.head
+        if not current_item:
+            return i
+        while current_item is not None:
+            i += 1
+            current_count = i
+            current_item = current_item.next_node
+        return current_count
+
   
 
 class Solution(object):
@@ -190,7 +248,6 @@ print(len(new_stack))
 new_stack.push(2)
 new_stack.push(3)
 new_stack.push(5)
-print(new_stack.stack)
 print(len(new_stack))
 print(f'Removed value is {new_stack.pop()}')
 
@@ -314,7 +371,7 @@ class BSTNode:
     self.left = None
     self.right = None
 
-
+  # O(log n) Runtime
   def insert(self, value):
     # take the current value of our node (self.value)
     # compare to the new value we want to insert
@@ -341,30 +398,83 @@ class BSTNode:
   def contains(self, target):
     if self.value == target:
       return True
-
-    found = False  
-    if self.value < target:
+ 
+    if self.value >= target:
       if self.left is None:
         return False
-      found = self.left.contains(target)
+      return self.left.contains(target)
 
-    if self.value >= target:
+    if self.value < target:
       if self.right is None:
         return False
-      found = self.right.contains(target)
-
-    return found
+      return self.right.contains(target)
 
 
   def get_max(self):
-    pass
-
+    if self.right is None:
+      return self.value
+    return self.right.get_max()
+  
+  # DFT
   def for_each(self, fn):
-    pass
+    # This will print in DFT
+    # fn(self.value)
+
+    if self.left:
+      self.left.for_each(fn)
+    # This will print in BFT
+    fn(self.value)
+
+    if self.right:
+      self.right.for_each(fn)
+
 
   def in_order_print(self, node):
     pass
 
+  def bft_print(self, node):
+    # create a queue for nodes
+    queue = Queue()
+    # add the first node to the queue
+    queue.enqueue(node)
+    # while the queue is not empty
+    while queue.size > 0:
+      # remove the first node from the queue
+      cur_node = queue.dequeue()
+      # print the removed node
+      print(cur_node.value)
+      # add all children into the queue
+      if cur_node.left:
+        queue.enqueue(cur_node.left)
+      if cur_node.right:
+        queue.enqueue(cur_node.right)
+
+
+  def dft_print(self, node):
+    # create a stack for nodes
+    stack = Stack()
+    # add the first node to the stack
+    stack.push(node)
+    # while the stack is not empty
+    while stack.size > 0:
+      # get the current node from the top of the stack
+      cur_node = stack.pop()
+      # print that node
+      print(cur_node.value)
+      # add all children to the stack (order matters)
+      if cur_node.right:
+        stack.push(cur_node.right)
+      if cur_node.left:
+        stack.push(cur_node.left)
 
 root_node = BSTNode(8)
 root_node.insert(3)
+root_node.insert(10)
+root_node.insert(9)
+root_node.insert(12)
+root_node.bft_print
+root_node.dft_print
+
+# print_node = lambda x: print(x)
+
+# root_node.for_each(print_node)
